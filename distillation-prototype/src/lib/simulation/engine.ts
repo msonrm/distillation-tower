@@ -243,11 +243,18 @@ export function updateKawasaki(
     [-1, 0],
   ];
 
-  // Randomize scan direction
+  // Randomize neighbor direction
   const startDir = Math.floor(Math.random() * 4);
 
-  for (let y = 0; y < gridHeight; y++) {
-    for (let x = 0; x < gridWidth; x++) {
+  // Randomize grid scan direction to prevent bias
+  const scanPattern = Math.floor(Math.random() * 4);
+  const reverseY = scanPattern & 1;
+  const reverseX = scanPattern & 2;
+
+  for (let yi = 0; yi < gridHeight; yi++) {
+    for (let xi = 0; xi < gridWidth; xi++) {
+      const y = reverseY ? gridHeight - 1 - yi : yi;
+      const x = reverseX ? gridWidth - 1 - xi : xi;
       if ((x + y) % 2 !== parity) continue;
 
       const cell = grid[y][x];
