@@ -40,9 +40,9 @@ export function createGrid(params: SimParams): Cell[][] {
         type = CellType.WALL;
         temperature = roomTemp;
       }
-      // Water pool at bottom
-      else if (y > gridHeight - 15 && y < gridHeight - 1) {
-        if (Math.random() < 0.7) {
+      // Water pool at bottom (~1/3 of grid)
+      else if (y > gridHeight * 0.65 && y < gridHeight - 1) {
+        if (Math.random() < 0.95) {
           type = CellType.WATER;
           temperature = roomTemp;
         }
@@ -243,14 +243,21 @@ export function updateKawasaki(
     [-1, 0],
   ];
 
-  // Randomize scan direction
-  const startDir = Math.floor(Math.random() * 4);
+  // Randomize grid scan direction to prevent bias
+  const scanPattern = Math.floor(Math.random() * 4);
+  const reverseY = scanPattern & 1;
+  const reverseX = scanPattern & 2;
 
-  for (let y = 0; y < gridHeight; y++) {
-    for (let x = 0; x < gridWidth; x++) {
+  for (let yi = 0; yi < gridHeight; yi++) {
+    for (let xi = 0; xi < gridWidth; xi++) {
+      const y = reverseY ? gridHeight - 1 - yi : yi;
+      const x = reverseX ? gridWidth - 1 - xi : xi;
       if ((x + y) % 2 !== parity) continue;
 
       const cell = grid[y][x];
+
+      // Randomize neighbor direction per cell
+      const startDir = Math.floor(Math.random() * 4);
       if (
         cell.type === CellType.WALL ||
         cell.type === CellType.HEAT_SOURCE ||
