@@ -40,9 +40,9 @@ export function createGrid(params: SimParams): Cell[][] {
         type = CellType.WALL;
         temperature = roomTemp;
       }
-      // Water pool at bottom
-      else if (y > gridHeight - 15 && y < gridHeight - 1) {
-        if (Math.random() < 0.7) {
+      // Water pool at bottom (~1/3 of grid)
+      else if (y > gridHeight * 0.65 && y < gridHeight - 1) {
+        if (Math.random() < 0.95) {
           type = CellType.WATER;
           temperature = roomTemp;
         }
