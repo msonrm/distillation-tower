@@ -243,9 +243,6 @@ export function updateKawasaki(
     [-1, 0],
   ];
 
-  // Randomize neighbor direction
-  const startDir = Math.floor(Math.random() * 4);
-
   // Randomize grid scan direction to prevent bias
   const scanPattern = Math.floor(Math.random() * 4);
   const reverseY = scanPattern & 1;
@@ -258,6 +255,9 @@ export function updateKawasaki(
       if ((x + y) % 2 !== parity) continue;
 
       const cell = grid[y][x];
+
+      // Randomize neighbor direction per cell
+      const startDir = Math.floor(Math.random() * 4);
       if (
         cell.type === CellType.WALL ||
         cell.type === CellType.HEAT_SOURCE ||
