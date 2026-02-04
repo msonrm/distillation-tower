@@ -1,6 +1,6 @@
 "use client";
 
-import { SimParams, SubstanceProps, CellKey, CELL_KEYS } from "@/lib/simulation";
+import { SimParams, SubstanceProps, FixedSubstanceProps, CellKey, CELL_KEYS } from "@/lib/simulation";
 import { ParamSlider } from "./ParamSlider";
 
 // Short labels for matrix display
@@ -19,6 +19,7 @@ interface ControlPanelProps {
   showTemp: boolean;
   onParamChange: (key: keyof SimParams, value: number) => void;
   onSubstanceChange: (substance: "A" | "B", key: keyof SubstanceProps, value: number) => void;
+  onFixedSubstanceChange: (substance: "wall" | "air", key: keyof FixedSubstanceProps, value: number) => void;
   onTensionChange: (from: CellKey, to: CellKey, value: number) => void;
   onToggleRunning: () => void;
   onReset: () => void;
@@ -31,6 +32,7 @@ export function ControlPanel({
   showTemp,
   onParamChange,
   onSubstanceChange,
+  onFixedSubstanceChange,
   onTensionChange,
   onToggleRunning,
   onReset,
@@ -92,29 +94,55 @@ export function ControlPanel({
           step={0.01}
           onChange={(v) => onSubstanceChange("A", "latentHeatThreshold", v)}
         />
+        <p className="text-xs text-gray-500 mt-2">液体:</p>
         <ParamSlider
-          label="比重"
-          value={params.substanceA.density}
+          label="比重(液)"
+          value={params.substanceA.liquidDensity}
           min={0.1}
           max={1}
           step={0.01}
-          onChange={(v) => onSubstanceChange("A", "density", v)}
+          onChange={(v) => onSubstanceChange("A", "liquidDensity", v)}
         />
         <ParamSlider
-          label="熱伝導率"
-          value={params.substanceA.thermalConductivity}
+          label="熱伝導率(液)"
+          value={params.substanceA.liquidThermalConductivity}
           min={0.01}
           max={1}
           step={0.01}
-          onChange={(v) => onSubstanceChange("A", "thermalConductivity", v)}
+          onChange={(v) => onSubstanceChange("A", "liquidThermalConductivity", v)}
         />
         <ParamSlider
-          label="比熱容量"
-          value={params.substanceA.heatCapacity}
+          label="比熱容量(液)"
+          value={params.substanceA.liquidHeatCapacity}
           min={0.01}
           max={1}
           step={0.01}
-          onChange={(v) => onSubstanceChange("A", "heatCapacity", v)}
+          onChange={(v) => onSubstanceChange("A", "liquidHeatCapacity", v)}
+        />
+        <p className="text-xs text-gray-500 mt-2">気体:</p>
+        <ParamSlider
+          label="比重(気)"
+          value={params.substanceA.gasDensity}
+          min={0.001}
+          max={0.1}
+          step={0.001}
+          onChange={(v) => onSubstanceChange("A", "gasDensity", v)}
+        />
+        <ParamSlider
+          label="熱伝導率(気)"
+          value={params.substanceA.gasThermalConductivity}
+          min={0.01}
+          max={0.5}
+          step={0.01}
+          onChange={(v) => onSubstanceChange("A", "gasThermalConductivity", v)}
+        />
+        <ParamSlider
+          label="比熱容量(気)"
+          value={params.substanceA.gasHeatCapacity}
+          min={0.01}
+          max={0.5}
+          step={0.01}
+          onChange={(v) => onSubstanceChange("A", "gasHeatCapacity", v)}
         />
 
         {/* Substance B (Water-like) */}
@@ -138,29 +166,97 @@ export function ControlPanel({
           step={0.01}
           onChange={(v) => onSubstanceChange("B", "latentHeatThreshold", v)}
         />
+        <p className="text-xs text-gray-500 mt-2">液体:</p>
         <ParamSlider
-          label="比重"
-          value={params.substanceB.density}
+          label="比重(液)"
+          value={params.substanceB.liquidDensity}
           min={0.1}
           max={1}
           step={0.01}
-          onChange={(v) => onSubstanceChange("B", "density", v)}
+          onChange={(v) => onSubstanceChange("B", "liquidDensity", v)}
         />
         <ParamSlider
-          label="熱伝導率"
-          value={params.substanceB.thermalConductivity}
+          label="熱伝導率(液)"
+          value={params.substanceB.liquidThermalConductivity}
           min={0.01}
           max={1}
           step={0.01}
-          onChange={(v) => onSubstanceChange("B", "thermalConductivity", v)}
+          onChange={(v) => onSubstanceChange("B", "liquidThermalConductivity", v)}
+        />
+        <ParamSlider
+          label="比熱容量(液)"
+          value={params.substanceB.liquidHeatCapacity}
+          min={0.01}
+          max={1}
+          step={0.01}
+          onChange={(v) => onSubstanceChange("B", "liquidHeatCapacity", v)}
+        />
+        <p className="text-xs text-gray-500 mt-2">気体:</p>
+        <ParamSlider
+          label="比重(気)"
+          value={params.substanceB.gasDensity}
+          min={0.001}
+          max={0.1}
+          step={0.001}
+          onChange={(v) => onSubstanceChange("B", "gasDensity", v)}
+        />
+        <ParamSlider
+          label="熱伝導率(気)"
+          value={params.substanceB.gasThermalConductivity}
+          min={0.01}
+          max={0.5}
+          step={0.01}
+          onChange={(v) => onSubstanceChange("B", "gasThermalConductivity", v)}
+        />
+        <ParamSlider
+          label="比熱容量(気)"
+          value={params.substanceB.gasHeatCapacity}
+          min={0.01}
+          max={0.5}
+          step={0.01}
+          onChange={(v) => onSubstanceChange("B", "gasHeatCapacity", v)}
+        />
+
+        {/* Wall */}
+        <h2 className="text-sm font-semibold text-gray-300 border-b border-gray-700 pb-1 mt-6">
+          壁（熱導体）
+        </h2>
+        <ParamSlider
+          label="熱伝導率"
+          value={params.wall.thermalConductivity}
+          min={0.1}
+          max={1}
+          step={0.01}
+          onChange={(v) => onFixedSubstanceChange("wall", "thermalConductivity", v)}
         />
         <ParamSlider
           label="比熱容量"
-          value={params.substanceB.heatCapacity}
-          min={0.01}
+          value={params.wall.heatCapacity}
+          min={0.1}
           max={1}
           step={0.01}
-          onChange={(v) => onSubstanceChange("B", "heatCapacity", v)}
+          onChange={(v) => onFixedSubstanceChange("wall", "heatCapacity", v)}
+        />
+
+        {/* Air */}
+        <h2 className="text-sm font-semibold text-gray-500 border-b border-gray-700 pb-1 mt-6">
+          空気（断熱材）
+        </h2>
+        <ParamSlider
+          label="熱伝導率"
+          value={params.air.thermalConductivity}
+          min={0.01}
+          max={0.3}
+          step={0.01}
+          onChange={(v) => onFixedSubstanceChange("air", "thermalConductivity", v)}
+        />
+        <ParamSlider
+          label="比熱容量"
+          value={params.air.heatCapacity}
+          min={0.01}
+          max={0.3}
+          step={0.01}
+          onChange={(v) => onFixedSubstanceChange("air", "heatCapacity", v)}
         />
 
         {/* System Parameters */}

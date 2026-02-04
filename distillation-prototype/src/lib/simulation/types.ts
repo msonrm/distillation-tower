@@ -12,11 +12,20 @@ export interface Cell {
 
 // Substance properties (all values 0-1)
 export interface SubstanceProps {
-  boilingPoint: number;      // temperature at which phase transition occurs
-  latentHeatThreshold: number; // latent heat needed for phase change
-  density: number;           // affects gravity/buoyancy
-  thermalConductivity: number; // how fast heat spreads
-  heatCapacity: number;      // resistance to temperature change
+  boilingPoint: number;           // temperature at which phase transition occurs
+  latentHeatThreshold: number;    // latent heat needed for phase change
+  liquidDensity: number;          // liquid density (affects gravity)
+  gasDensity: number;             // gas density (much lower than liquid)
+  liquidThermalConductivity: number;  // how fast heat spreads in liquid
+  gasThermalConductivity: number;     // how fast heat spreads in gas
+  liquidHeatCapacity: number;     // resistance to temperature change in liquid
+  gasHeatCapacity: number;        // resistance to temperature change in gas
+}
+
+// Wall and air properties
+export interface FixedSubstanceProps {
+  thermalConductivity: number;
+  heatCapacity: number;
 }
 
 // Cell keys for interface tension matrix
@@ -36,6 +45,8 @@ export interface SimParams {
   gravity: number;           // strength of gravity in Kawasaki
   substanceA: SubstanceProps;
   substanceB: SubstanceProps;
+  wall: FixedSubstanceProps;
+  air: FixedSubstanceProps;
   interfaceTension: InterfaceTensionMatrix;
 }
 
@@ -53,17 +64,33 @@ export interface SimStats {
 export const DEFAULT_SUBSTANCE_A: SubstanceProps = {
   boilingPoint: 0.6,
   latentHeatThreshold: 0.3,
-  density: 0.7,
-  thermalConductivity: 0.5,
-  heatCapacity: 0.4,
+  liquidDensity: 0.7,
+  gasDensity: 0.01,
+  liquidThermalConductivity: 0.5,
+  gasThermalConductivity: 0.1,
+  liquidHeatCapacity: 0.4,
+  gasHeatCapacity: 0.2,
 };
 
 export const DEFAULT_SUBSTANCE_B: SubstanceProps = {
   boilingPoint: 0.85,
   latentHeatThreshold: 0.5,
-  density: 0.9,
-  thermalConductivity: 0.6,
-  heatCapacity: 0.6,
+  liquidDensity: 0.9,
+  gasDensity: 0.01,
+  liquidThermalConductivity: 0.6,
+  gasThermalConductivity: 0.1,
+  liquidHeatCapacity: 0.6,
+  gasHeatCapacity: 0.3,
+};
+
+export const DEFAULT_WALL: FixedSubstanceProps = {
+  thermalConductivity: 0.8,
+  heatCapacity: 1.0,
+};
+
+export const DEFAULT_AIR: FixedSubstanceProps = {
+  thermalConductivity: 0.05,
+  heatCapacity: 0.05,
 };
 
 // Default interface tension matrix (symmetric)
@@ -85,5 +112,7 @@ export const DEFAULT_PARAMS: SimParams = {
   gravity: 2.0,
   substanceA: DEFAULT_SUBSTANCE_A,
   substanceB: DEFAULT_SUBSTANCE_B,
+  wall: DEFAULT_WALL,
+  air: DEFAULT_AIR,
   interfaceTension: DEFAULT_INTERFACE_TENSION,
 };

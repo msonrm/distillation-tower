@@ -5,14 +5,6 @@ export function getCellKey(substance: Substance, phase: Phase): string {
   return `${substance}:${phase}`;
 }
 
-// Fixed properties for wall and air
-export const WALL_THERMAL_CONDUCTIVITY = 0.8;  // conducts heat well
-export const WALL_HEAT_CAPACITY = 1.0;
-
-export const AIR_THERMAL_CONDUCTIVITY = 0.05;  // insulator
-export const AIR_HEAT_CAPACITY = 0.05;
-export const AIR_DENSITY = 0.01;
-
 // Cohesion (how much same-type cells want to stick together)
 export const COHESION: Record<string, number> = {
   "A:liquid": 0.6,

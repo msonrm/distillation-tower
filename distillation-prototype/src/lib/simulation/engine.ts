@@ -1,13 +1,5 @@
 import { Cell, Substance, Phase, SimParams, SimStats, SubstanceProps, CellKey } from "./types";
-import {
-  getCellKey,
-  COHESION,
-  WALL_THERMAL_CONDUCTIVITY,
-  WALL_HEAT_CAPACITY,
-  AIR_THERMAL_CONDUCTIVITY,
-  AIR_HEAT_CAPACITY,
-  AIR_DENSITY,
-} from "./constants";
+import { getCellKey, COHESION } from "./constants";
 
 // =============================================================================
 // Helper Functions
@@ -21,25 +13,26 @@ function getSubstanceProps(cell: Cell, params: SimParams): SubstanceProps | null
 
 function getDensity(cell: Cell, params: SimParams): number {
   if (cell.substance === "wall") return Infinity;
-  if (cell.substance === "air") return AIR_DENSITY;
+  if (cell.substance === "air") return 0.01; // Air density is very low, fixed
   const props = getSubstanceProps(cell, params);
   if (!props) return 0;
-  // Gas is much lighter than liquid
-  return cell.phase === "liquid" ? props.density : props.density * 0.01;
+  return cell.phase === "liquid" ? props.liquidDensity : props.gasDensity;
 }
 
 function getThermalConductivity(cell: Cell, params: SimParams): number {
-  if (cell.substance === "wall") return WALL_THERMAL_CONDUCTIVITY;
-  if (cell.substance === "air") return AIR_THERMAL_CONDUCTIVITY;
+  if (cell.substance === "wall") return params.wall.thermalConductivity;
+  if (cell.substance === "air") return params.air.thermalConductivity;
   const props = getSubstanceProps(cell, params);
-  return props?.thermalConductivity ?? 0.1;
+  if (!props) return 0.1;
+  return cell.phase === "liquid" ? props.liquidThermalConductivity : props.gasThermalConductivity;
 }
 
 function getHeatCapacity(cell: Cell, params: SimParams): number {
-  if (cell.substance === "wall") return WALL_HEAT_CAPACITY;
-  if (cell.substance === "air") return AIR_HEAT_CAPACITY;
+  if (cell.substance === "wall") return params.wall.heatCapacity;
+  if (cell.substance === "air") return params.air.heatCapacity;
   const props = getSubstanceProps(cell, params);
-  return props?.heatCapacity ?? 0.5;
+  if (!props) return 0.5;
+  return cell.phase === "liquid" ? props.liquidHeatCapacity : props.gasHeatCapacity;
 }
 
 function getNeighbors(

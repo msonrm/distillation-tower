@@ -6,6 +6,7 @@ import {
   SimParams,
   SimStats,
   SubstanceProps,
+  FixedSubstanceProps,
   CellKey,
   DEFAULT_PARAMS,
   createGrid,
@@ -126,6 +127,20 @@ export default function DistillationSimulator() {
     }));
   };
 
+  const handleFixedSubstanceChange = (
+    substance: "wall" | "air",
+    key: keyof FixedSubstanceProps,
+    value: number
+  ) => {
+    setParams((prev) => ({
+      ...prev,
+      [substance]: {
+        ...prev[substance],
+        [key]: value,
+      },
+    }));
+  };
+
   const handleReset = () => {
     setRunning(false);
     initGrid();
@@ -149,6 +164,7 @@ export default function DistillationSimulator() {
         showTemp={showTemp}
         onParamChange={handleParamChange}
         onSubstanceChange={handleSubstanceChange}
+        onFixedSubstanceChange={handleFixedSubstanceChange}
         onTensionChange={handleTensionChange}
         onToggleRunning={() => setRunning(!running)}
         onReset={handleReset}
