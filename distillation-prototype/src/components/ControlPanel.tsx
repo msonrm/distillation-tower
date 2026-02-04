@@ -313,7 +313,7 @@ export function ControlPanel({
                         <input
                           type="number"
                           step="0.1"
-                          min="0"
+                          min="-1"
                           max="2"
                           value={params.interfaceTension[rowKey][colKey]}
                           onChange={(e) => {
