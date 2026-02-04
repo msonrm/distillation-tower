@@ -5,6 +5,7 @@ import {
   Cell,
   SimParams,
   SimStats,
+  SubstanceProps,
   DEFAULT_PARAMS,
   createGrid,
   simulateStep,
@@ -12,14 +13,25 @@ import {
 } from "@/lib/simulation";
 import { ControlPanel, SimulationCanvas } from "@/components";
 
-export default function DistillationPrototype() {
+export default function DistillationSimulator() {
   const gridRef = useRef<Cell[][] | null>(null);
   const animationRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(performance.now());
+  const fpsRef = useRef<number>(0);
+  const frameCountRef = useRef<number>(0);
+
   const [frame, setFrame] = useState(0);
   const [running, setRunning] = useState(false);
   const [params, setParams] = useState<SimParams>(DEFAULT_PARAMS);
   const [showTemp, setShowTemp] = useState(true);
-  const [stats, setStats] = useState<SimStats>({ water: 0, vapor: 0, avgTemp: 0 });
+  const [stats, setStats] = useState<SimStats>({
+    liquidA: 0,
+    liquidB: 0,
+    gasA: 0,
+    gasB: 0,
+    avgTemp: 0,
+    fps: 0,
+  });
 
   const cellSize =
     typeof window !== "undefined"
@@ -32,8 +44,9 @@ export default function DistillationPrototype() {
   const initGrid = useCallback(() => {
     gridRef.current = createGrid(params);
     setFrame(0);
+    frameCountRef.current = 0;
     if (gridRef.current) {
-      setStats(calculateStats(gridRef.current));
+      setStats({ ...calculateStats(gridRef.current), fps: 0 });
     }
   }, [params]);
 
@@ -45,9 +58,20 @@ export default function DistillationPrototype() {
     const grid = gridRef.current;
     if (!grid) return;
 
+    // Calculate FPS
+    const now = performance.now();
+    frameCountRef.current++;
+    if (now - lastTimeRef.current >= 1000) {
+      fpsRef.current = frameCountRef.current;
+      frameCountRef.current = 0;
+      lastTimeRef.current = now;
+    }
+
     simulateStep(grid, params, frame);
     setFrame((f) => f + 1);
-    setStats(calculateStats(grid));
+
+    const newStats = calculateStats(grid);
+    setStats({ ...newStats, fps: fpsRef.current });
 
     if (running) {
       animationRef.current = requestAnimationFrame(simulate);
@@ -67,6 +91,20 @@ export default function DistillationPrototype() {
 
   const handleParamChange = (key: keyof SimParams, value: number) => {
     setParams((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubstanceChange = (
+    substance: "A" | "B",
+    key: keyof SubstanceProps,
+    value: number
+  ) => {
+    setParams((prev) => ({
+      ...prev,
+      [substance === "A" ? "substanceA" : "substanceB"]: {
+        ...prev[substance === "A" ? "substanceA" : "substanceB"],
+        [key]: value,
+      },
+    }));
   };
 
   const handleReset = () => {
@@ -91,6 +129,7 @@ export default function DistillationPrototype() {
         running={running}
         showTemp={showTemp}
         onParamChange={handleParamChange}
+        onSubstanceChange={handleSubstanceChange}
         onToggleRunning={() => setRunning(!running)}
         onReset={handleReset}
         onToggleShowTemp={setShowTemp}

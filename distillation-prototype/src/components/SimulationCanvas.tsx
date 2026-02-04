@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useEffect, useCallback } from "react";
-import { Cell, CellType, SimStats } from "@/lib/simulation";
-import { COLORS } from "@/lib/simulation";
+import { Cell, SimStats } from "@/lib/simulation";
+import { getCellKey, COLORS, getTemperatureColor } from "@/lib/simulation";
 
 interface SimulationCanvasProps {
   grid: Cell[][] | null;
@@ -10,19 +10,6 @@ interface SimulationCanvasProps {
   showTemp: boolean;
   frame: number;
   stats: SimStats;
-}
-
-function temperatureToColor(temp: number, baseColor: string): string {
-  const normalized = Math.max(0, Math.min(1, (temp - 20) / 180));
-
-  if (baseColor === COLORS[CellType.WATER] || baseColor === COLORS[CellType.VAPOR]) {
-    const r = Math.floor(59 + normalized * 180);
-    const g = Math.floor(130 - normalized * 80);
-    const b = Math.floor(246 - normalized * 150);
-    return `rgb(${r},${g},${b})`;
-  }
-
-  return baseColor;
 }
 
 export function SimulationCanvas({
@@ -47,15 +34,11 @@ export function SimulationCanvas({
     for (let y = 0; y < grid.length; y++) {
       for (let x = 0; x < grid[y].length; x++) {
         const cell = grid[y][x];
-        let color = COLORS[cell.type] ?? "#000";
+        const cellKey = getCellKey(cell.substance, cell.phase);
+        let color = COLORS[cellKey] ?? "#000";
 
-        if (
-          showTemp &&
-          (cell.type === CellType.WATER ||
-            cell.type === CellType.VAPOR ||
-            cell.type === CellType.EMPTY)
-        ) {
-          color = temperatureToColor(cell.temperature, color);
+        if (showTemp && cell.substance !== "wall") {
+          color = getTemperatureColor(color, cell.temperature);
         }
 
         ctx.fillStyle = color;
@@ -80,8 +63,11 @@ export function SimulationCanvas({
         className="border border-gray-700 rounded"
       />
       <div className="absolute top-2 left-2 bg-black/70 px-2 py-1 rounded text-xs font-mono">
-        Frame: {frame} | Water: {stats.water} | Vapor: {stats.vapor} | Avg Temp:{" "}
-        {stats.avgTemp}°
+        <div>Frame: {frame} | FPS: {stats.fps.toFixed(1)}</div>
+        <div>
+          A: {stats.liquidA}L/{stats.gasA}G | B: {stats.liquidB}L/{stats.gasB}G
+        </div>
+        <div>Avg Temp: {(stats.avgTemp * 100).toFixed(0)}%</div>
       </div>
     </div>
   );

@@ -1,68 +1,114 @@
-import { CellType, SimParams } from "./types";
+import { Substance, Phase } from "./types";
 
-export const DEFAULT_PARAMS: SimParams = {
-  gridWidth: 100,
-  gridHeight: 100,
-  gravity: 2.0,
-  boilingPoint: 100,
-  vaporizeRate: 0.15,
-  condenseRate: 0.08,
-  thermalConductivity: 0.3,
-  heatSourceTemp: 200,
-  coldSourceTemp: 15,
-  roomTemp: 25,
-  latentHeatVaporize: 20,
-  latentHeatCondense: 15,
-};
+// Cell key for lookup: "substance:phase"
+// Using string type for flexibility since wall/air only use specific phases
+export type CellKey = string;
+
+export function getCellKey(substance: Substance, phase: Phase): CellKey {
+  return `${substance}:${phase}`;
+}
+
+// Fixed properties for wall and air
+export const WALL_THERMAL_CONDUCTIVITY = 0.8;  // conducts heat well
+export const WALL_HEAT_CAPACITY = 1.0;
+
+export const AIR_THERMAL_CONDUCTIVITY = 0.05;  // insulator
+export const AIR_HEAT_CAPACITY = 0.05;
+export const AIR_DENSITY = 0.01;
 
 // Interface tension matrix
-export const INTERFACE_TENSION: Record<number, Record<number, number>> = {
-  [CellType.EMPTY]: {
-    [CellType.EMPTY]: 0,
-    [CellType.WATER]: 1.2,
-    [CellType.VAPOR]: 0.2,
+// Higher values = stronger repulsion = harder to mix
+// Keys: "substance:phase"
+export const INTERFACE_TENSION: Record<CellKey, Record<CellKey, number>> = {
+  // Liquid A (alcohol-like)
+  "A:liquid": {
+    "A:liquid": 0.0,
+    "A:gas": 0.3,
+    "B:liquid": 0.8,   // A and B liquids repel somewhat
+    "B:gas": 0.5,
+    "wall:liquid": 0.3,
+    "air:gas": 1.0,
   },
-  [CellType.WATER]: {
-    [CellType.EMPTY]: 1.2,
-    [CellType.WATER]: 0,
-    [CellType.VAPOR]: 0.3,
+  // Gas A (alcohol vapor)
+  "A:gas": {
+    "A:liquid": 0.3,
+    "A:gas": 0.0,
+    "B:liquid": 0.6,
+    "B:gas": 0.2,
+    "wall:liquid": 0.3,
+    "air:gas": 0.2,
   },
-  [CellType.VAPOR]: {
-    [CellType.EMPTY]: 0.2,
-    [CellType.WATER]: 0.3,
-    [CellType.VAPOR]: 0,
+  // Liquid B (water-like)
+  "B:liquid": {
+    "A:liquid": 0.8,
+    "A:gas": 0.6,
+    "B:liquid": 0.0,
+    "B:gas": 0.3,
+    "wall:liquid": 0.3,
+    "air:gas": 1.2,
+  },
+  // Gas B (water vapor)
+  "B:gas": {
+    "A:liquid": 0.5,
+    "A:gas": 0.2,
+    "B:liquid": 0.3,
+    "B:gas": 0.0,
+    "wall:liquid": 0.3,
+    "air:gas": 0.2,
+  },
+  // Wall
+  "wall:liquid": {
+    "A:liquid": 0.3,
+    "A:gas": 0.3,
+    "B:liquid": 0.3,
+    "B:gas": 0.3,
+    "wall:liquid": 0.0,
+    "air:gas": 0.3,
+  },
+  // Air
+  "air:gas": {
+    "A:liquid": 1.0,
+    "A:gas": 0.2,
+    "B:liquid": 1.2,
+    "B:gas": 0.2,
+    "wall:liquid": 0.3,
+    "air:gas": 0.0,
   },
 };
 
-export const DENSITY: Record<number, number> = {
-  [CellType.EMPTY]: 0,
-  [CellType.WATER]: 1.0,
-  [CellType.VAPOR]: 0.0001,
-  [CellType.WALL]: Infinity,
-  [CellType.HEAT_SOURCE]: Infinity,
-  [CellType.COLD_SOURCE]: Infinity,
+// Cohesion (how much same-type cells want to stick together)
+export const COHESION: Record<CellKey, number> = {
+  "A:liquid": 0.6,
+  "A:gas": 0.1,
+  "B:liquid": 0.8,
+  "B:gas": 0.1,
+  "wall:liquid": 1.0,
+  "air:gas": 0.0,
 };
 
-export const COHESION: Record<number, number> = {
-  [CellType.EMPTY]: 0,
-  [CellType.WATER]: 0.8,
-  [CellType.VAPOR]: 0.1,
+// Colors for rendering
+export const COLORS: Record<CellKey, string> = {
+  "A:liquid": "#f97316",  // orange (alcohol)
+  "A:gas": "#fed7aa",     // light orange (alcohol vapor)
+  "B:liquid": "#3b82f6",  // blue (water)
+  "B:gas": "#93c5fd",     // light blue (water vapor)
+  "wall:liquid": "#374151", // gray
+  "air:gas": "#0d1117",   // dark background
 };
 
-export const THERMAL_CONDUCTIVITY: Record<number, number> = {
-  [CellType.EMPTY]: 0.01,
-  [CellType.WATER]: 0.6,
-  [CellType.VAPOR]: 0.02,
-  [CellType.WALL]: 0.8,
-  [CellType.HEAT_SOURCE]: 1.0,
-  [CellType.COLD_SOURCE]: 1.0,
-};
+// Temperature-based color blending
+export function getTemperatureColor(baseColor: string, temperature: number): string {
+  // temperature: 0.0 (cold) to 1.0 (hot)
+  // Blend towards red for hot
+  const hex = baseColor.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
 
-export const COLORS: Record<number, string> = {
-  [CellType.EMPTY]: "#0d1117",
-  [CellType.WATER]: "#3b82f6",
-  [CellType.VAPOR]: "#93c5fd",
-  [CellType.WALL]: "#374151",
-  [CellType.HEAT_SOURCE]: "#ef4444",
-  [CellType.COLD_SOURCE]: "#06b6d4",
-};
+  const hotness = Math.pow(temperature, 1.5); // non-linear for better visualization
+  const newR = Math.min(255, Math.floor(r + (255 - r) * hotness * 0.5));
+  const newG = Math.floor(g * (1 - hotness * 0.3));
+  const newB = Math.floor(b * (1 - hotness * 0.5));
+
+  return `rgb(${newR},${newG},${newB})`;
+}
