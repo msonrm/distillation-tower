@@ -109,18 +109,18 @@ export default function DistillationSimulator() {
     }));
   };
 
-  const handleTensionChange = (from: CellKey, to: CellKey, value: number) => {
+  const handleInteractionChange = (from: CellKey, to: CellKey, value: number) => {
     setParams((prev) => ({
       ...prev,
-      interfaceTension: {
-        ...prev.interfaceTension,
+      interaction: {
+        ...prev.interaction,
         [from]: {
-          ...prev.interfaceTension[from],
+          ...prev.interaction[from],
           [to]: value,
         },
         // Keep symmetric
         [to]: {
-          ...prev.interfaceTension[to],
+          ...prev.interaction[to],
           [from]: value,
         },
       },
@@ -165,7 +165,7 @@ export default function DistillationSimulator() {
         onParamChange={handleParamChange}
         onSubstanceChange={handleSubstanceChange}
         onFixedSubstanceChange={handleFixedSubstanceChange}
-        onTensionChange={handleTensionChange}
+        onInteractionChange={handleInteractionChange}
         onToggleRunning={() => setRunning(!running)}
         onReset={handleReset}
         onToggleShowTemp={setShowTemp}

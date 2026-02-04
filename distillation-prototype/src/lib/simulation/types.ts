@@ -28,12 +28,12 @@ export interface FixedSubstanceProps {
   heatCapacity: number;
 }
 
-// Cell keys for interface tension matrix
+// Cell keys for interaction matrix
 export const CELL_KEYS = ["A:liquid", "A:gas", "B:liquid", "B:gas", "wall:liquid", "air:gas"] as const;
 export type CellKey = (typeof CELL_KEYS)[number];
 
-// Interface tension matrix type
-export type InterfaceTensionMatrix = Record<CellKey, Record<CellKey, number>>;
+// Interaction matrix type (negative = attracts, positive = repels)
+export type InteractionMatrix = Record<CellKey, Record<CellKey, number>>;
 
 // Simulation parameters
 export interface SimParams {
@@ -47,7 +47,7 @@ export interface SimParams {
   substanceB: SubstanceProps;
   wall: FixedSubstanceProps;
   air: FixedSubstanceProps;
-  interfaceTension: InterfaceTensionMatrix;
+  interaction: InteractionMatrix;
 }
 
 // Statistics for display
@@ -93,10 +93,10 @@ export const DEFAULT_AIR: FixedSubstanceProps = {
   heatCapacity: 0.05,
 };
 
-// Default interface tension matrix (symmetric)
+// Default interaction matrix (symmetric)
 // Negative = attracts (same substance liquid-gas, liquid-wall adhesion)
 // Positive = repels (different substances, liquid-air surface tension)
-export const DEFAULT_INTERFACE_TENSION: InterfaceTensionMatrix = {
+export const DEFAULT_INTERACTION: InteractionMatrix = {
   "A:liquid": { "A:liquid": 0, "A:gas": -0.3, "B:liquid": 0.8, "B:gas": 0.5, "wall:liquid": -0.2, "air:gas": 1.0 },
   "A:gas":    { "A:liquid": -0.3, "A:gas": 0, "B:liquid": 0.6, "B:gas": 0.2, "wall:liquid": 0.1, "air:gas": 0.1 },
   "B:liquid": { "A:liquid": 0.8, "A:gas": 0.6, "B:liquid": 0, "B:gas": -0.3, "wall:liquid": -0.2, "air:gas": 1.2 },
@@ -116,5 +116,5 @@ export const DEFAULT_PARAMS: SimParams = {
   substanceB: DEFAULT_SUBSTANCE_B,
   wall: DEFAULT_WALL,
   air: DEFAULT_AIR,
-  interfaceTension: DEFAULT_INTERFACE_TENSION,
+  interaction: DEFAULT_INTERACTION,
 };

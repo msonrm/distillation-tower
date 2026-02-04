@@ -276,8 +276,8 @@ function calculateEnergy(
       sameTypeCount++;
     }
 
-    const tension = params.interfaceTension[cellKey as CellKey]?.[neighborKey as CellKey] ?? 0.5;
-    interfaceEnergy += tension * 0.8;
+    const interactionParam = params.interaction[cellKey as CellKey]?.[neighborKey as CellKey] ?? 0.5;
+    interfaceEnergy += interactionParam * 0.8;
   }
 
   const cohesionEnergy = -cohesion * 0.5 * sameTypeCount;

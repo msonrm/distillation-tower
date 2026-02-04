@@ -20,7 +20,7 @@ interface ControlPanelProps {
   onParamChange: (key: keyof SimParams, value: number) => void;
   onSubstanceChange: (substance: "A" | "B", key: keyof SubstanceProps, value: number) => void;
   onFixedSubstanceChange: (substance: "wall" | "air", key: keyof FixedSubstanceProps, value: number) => void;
-  onTensionChange: (from: CellKey, to: CellKey, value: number) => void;
+  onInteractionChange: (from: CellKey, to: CellKey, value: number) => void;
   onToggleRunning: () => void;
   onReset: () => void;
   onToggleShowTemp: (show: boolean) => void;
@@ -33,7 +33,7 @@ export function ControlPanel({
   onParamChange,
   onSubstanceChange,
   onFixedSubstanceChange,
-  onTensionChange,
+  onInteractionChange,
   onToggleRunning,
   onReset,
   onToggleShowTemp,
@@ -281,12 +281,12 @@ export function ControlPanel({
           onChange={(v) => onParamChange("coolingCoefficient", v)}
         />
 
-        {/* Interface Tension Matrix */}
+        {/* Interaction Matrix */}
         <h2 className="text-sm font-semibold text-purple-400 border-b border-gray-700 pb-1 mt-6">
-          界面活性度マトリックス
+          相互作用パラメータ
         </h2>
         <p className="text-xs text-gray-500 mb-2">
-          値が大きい = 反発が強い = 混ざりにくい
+          正 = 反発（混ざりにくい）、負 = 引力（くっつく）
         </p>
 
         <div className="overflow-x-auto">
@@ -315,16 +315,16 @@ export function ControlPanel({
                           step="0.1"
                           min="-1"
                           max="2"
-                          value={params.interfaceTension[rowKey][colKey]}
+                          value={params.interaction[rowKey][colKey]}
                           onChange={(e) => {
                             const val = parseFloat(e.target.value) || 0;
-                            onTensionChange(rowKey, colKey, val);
+                            onInteractionChange(rowKey, colKey, val);
                           }}
                           className="w-10 px-1 py-0.5 bg-gray-800 border border-gray-700 rounded text-center text-gray-200"
                         />
                       ) : (
                         <span className="text-gray-600 block text-center text-[10px]">
-                          {params.interfaceTension[rowKey][colKey].toFixed(1)}
+                          {params.interaction[rowKey][colKey].toFixed(1)}
                         </span>
                       )}
                     </td>
