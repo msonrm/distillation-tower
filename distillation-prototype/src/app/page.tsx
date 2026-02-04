@@ -6,6 +6,7 @@ import {
   SimParams,
   SimStats,
   SubstanceProps,
+  CellKey,
   DEFAULT_PARAMS,
   createGrid,
   simulateStep,
@@ -107,6 +108,24 @@ export default function DistillationSimulator() {
     }));
   };
 
+  const handleTensionChange = (from: CellKey, to: CellKey, value: number) => {
+    setParams((prev) => ({
+      ...prev,
+      interfaceTension: {
+        ...prev.interfaceTension,
+        [from]: {
+          ...prev.interfaceTension[from],
+          [to]: value,
+        },
+        // Keep symmetric
+        [to]: {
+          ...prev.interfaceTension[to],
+          [from]: value,
+        },
+      },
+    }));
+  };
+
   const handleReset = () => {
     setRunning(false);
     initGrid();
@@ -130,6 +149,7 @@ export default function DistillationSimulator() {
         showTemp={showTemp}
         onParamChange={handleParamChange}
         onSubstanceChange={handleSubstanceChange}
+        onTensionChange={handleTensionChange}
         onToggleRunning={() => setRunning(!running)}
         onReset={handleReset}
         onToggleShowTemp={setShowTemp}

@@ -1,8 +1,6 @@
-import { Cell, Substance, Phase, SimParams, SimStats, SubstanceProps } from "./types";
+import { Cell, Substance, Phase, SimParams, SimStats, SubstanceProps, CellKey } from "./types";
 import {
   getCellKey,
-  CellKey,
-  INTERFACE_TENSION,
   COHESION,
   WALL_THERMAL_CONDUCTIVITY,
   WALL_HEAT_CAPACITY,
@@ -285,7 +283,7 @@ function calculateEnergy(
       sameTypeCount++;
     }
 
-    const tension = INTERFACE_TENSION[cellKey]?.[neighborKey] ?? 0.5;
+    const tension = params.interfaceTension[cellKey as CellKey]?.[neighborKey as CellKey] ?? 0.5;
     interfaceEnergy += tension * 0.8;
   }
 

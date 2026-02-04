@@ -19,6 +19,13 @@ export interface SubstanceProps {
   heatCapacity: number;      // resistance to temperature change
 }
 
+// Cell keys for interface tension matrix
+export const CELL_KEYS = ["A:liquid", "A:gas", "B:liquid", "B:gas", "wall:liquid", "air:gas"] as const;
+export type CellKey = (typeof CELL_KEYS)[number];
+
+// Interface tension matrix type
+export type InterfaceTensionMatrix = Record<CellKey, Record<CellKey, number>>;
+
 // Simulation parameters
 export interface SimParams {
   gridWidth: number;
@@ -29,6 +36,7 @@ export interface SimParams {
   gravity: number;           // strength of gravity in Kawasaki
   substanceA: SubstanceProps;
   substanceB: SubstanceProps;
+  interfaceTension: InterfaceTensionMatrix;
 }
 
 // Statistics for display
@@ -58,6 +66,16 @@ export const DEFAULT_SUBSTANCE_B: SubstanceProps = {
   heatCapacity: 0.6,
 };
 
+// Default interface tension matrix (symmetric)
+export const DEFAULT_INTERFACE_TENSION: InterfaceTensionMatrix = {
+  "A:liquid": { "A:liquid": 0, "A:gas": 0.3, "B:liquid": 0.8, "B:gas": 0.5, "wall:liquid": 0.3, "air:gas": 1.0 },
+  "A:gas":    { "A:liquid": 0.3, "A:gas": 0, "B:liquid": 0.6, "B:gas": 0.2, "wall:liquid": 0.3, "air:gas": 0.2 },
+  "B:liquid": { "A:liquid": 0.8, "A:gas": 0.6, "B:liquid": 0, "B:gas": 0.3, "wall:liquid": 0.3, "air:gas": 1.2 },
+  "B:gas":    { "A:liquid": 0.5, "A:gas": 0.2, "B:liquid": 0.3, "B:gas": 0, "wall:liquid": 0.3, "air:gas": 0.2 },
+  "wall:liquid": { "A:liquid": 0.3, "A:gas": 0.3, "B:liquid": 0.3, "B:gas": 0.3, "wall:liquid": 0, "air:gas": 0.3 },
+  "air:gas":  { "A:liquid": 1.0, "A:gas": 0.2, "B:liquid": 1.2, "B:gas": 0.2, "wall:liquid": 0.3, "air:gas": 0 },
+};
+
 export const DEFAULT_PARAMS: SimParams = {
   gridWidth: 100,
   gridHeight: 100,
@@ -67,4 +85,5 @@ export const DEFAULT_PARAMS: SimParams = {
   gravity: 2.0,
   substanceA: DEFAULT_SUBSTANCE_A,
   substanceB: DEFAULT_SUBSTANCE_B,
+  interfaceTension: DEFAULT_INTERFACE_TENSION,
 };
