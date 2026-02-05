@@ -287,11 +287,19 @@ function calculateEnergy(
 
 function updateKawasaki(grid: Cell[][], params: SimParams, parity: number): void {
   const { gridWidth, gridHeight } = params;
-  const directions = [
-    [0, 1],
-    [1, 0],
-    [0, -1],
-    [-1, 0],
+
+  // 8 directions: 4 orthogonal + 4 diagonal
+  // Each direction has [dx, dy, distance] where distance is 1 for orthogonal, √2 for diagonal
+  const SQRT2 = Math.SQRT2;
+  const directions: [number, number, number][] = [
+    [0, 1, 1],      // down
+    [1, 0, 1],      // right
+    [0, -1, 1],     // up
+    [-1, 0, 1],     // left
+    [1, 1, SQRT2],  // down-right (diagonal)
+    [1, -1, SQRT2], // up-right (diagonal)
+    [-1, 1, SQRT2], // down-left (diagonal)
+    [-1, -1, SQRT2],// up-left (diagonal)
   ];
 
   // Randomize grid scan direction to prevent bias (8 patterns)
@@ -316,12 +324,15 @@ function updateKawasaki(grid: Cell[][], params: SimParams, parity: number): void
       // Skip walls
       if (cell.substance === "wall") continue;
 
-      // Randomize neighbor direction per cell
-      const startDir = Math.floor(Math.random() * 4);
+      // Shuffle directions using Fisher-Yates for true randomization
+      const shuffledDirs = [...directions];
+      for (let i = shuffledDirs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledDirs[i], shuffledDirs[j]] = [shuffledDirs[j], shuffledDirs[i]];
+      }
 
       // Try exchange with neighbors
-      for (let i = 0; i < 4; i++) {
-        const [dx, dy] = directions[(startDir + i) % 4];
+      for (const [dx, dy, dist] of shuffledDirs) {
         const nx = x + dx;
         const ny = y + dy;
 
@@ -350,7 +361,9 @@ function updateKawasaki(grid: Cell[][], params: SimParams, parity: number): void
           calculateEnergy(grid, x, y, params) +
           calculateEnergy(grid, nx, ny, params);
 
-        const deltaE = energyAfter - energyBefore;
+        // Scale deltaE by 1/distance for diagonal exchanges
+        // (diagonal exchanges have weaker coupling due to smaller contact area)
+        const deltaE = (energyAfter - energyBefore) / dist;
         const localTemp = (cell.temperature + neighbor.temperature) / 2 + 0.1;
         const beta = 1 / (localTemp * 0.5 + 0.1);
 
