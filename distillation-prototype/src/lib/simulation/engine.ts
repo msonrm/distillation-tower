@@ -294,13 +294,19 @@ function updateKawasaki(grid: Cell[][], params: SimParams, parity: number): void
     [-1, 0],
   ];
 
-  // Randomize grid scan direction to prevent bias
-  const scanPattern = Math.floor(Math.random() * 4);
-  const reverseY = scanPattern & 1;
-  const reverseX = scanPattern & 2;
+  // Randomize grid scan direction to prevent bias (8 patterns)
+  const scanPattern = Math.floor(Math.random() * 8);
+  const reverseY = (scanPattern & 1) !== 0;
+  const reverseX = (scanPattern & 2) !== 0;
+  const swapXY = (scanPattern & 4) !== 0; // Swap outer/inner loop
 
-  for (let yi = 0; yi < gridHeight; yi++) {
-    for (let xi = 0; xi < gridWidth; xi++) {
+  const outerSize = swapXY ? gridWidth : gridHeight;
+  const innerSize = swapXY ? gridHeight : gridWidth;
+
+  for (let outer = 0; outer < outerSize; outer++) {
+    for (let inner = 0; inner < innerSize; inner++) {
+      const yi = swapXY ? inner : outer;
+      const xi = swapXY ? outer : inner;
       const y = reverseY ? gridHeight - 1 - yi : yi;
       const x = reverseX ? gridWidth - 1 - xi : xi;
       if ((x + y) % 2 !== parity) continue;
