@@ -27,17 +27,27 @@ export const COLORS: Record<string, string> = {
 
 // Temperature-based color blending
 export function getTemperatureColor(baseColor: string, temperature: number): string {
-  // temperature: 0.0 (cold) to 1.0 (hot)
-  // Blend towards red for hot
+  // temperature: -1.0 (very cold) to 0.0 (room temp) to 1.0 (hot)
   const hex = baseColor.replace("#", "");
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
 
-  const hotness = Math.pow(temperature, 1.5); // non-linear for better visualization
-  const newR = Math.min(255, Math.floor(r + (255 - r) * hotness * 0.5));
-  const newG = Math.floor(g * (1 - hotness * 0.3));
-  const newB = Math.floor(b * (1 - hotness * 0.5));
+  let newR = r, newG = g, newB = b;
+
+  if (temperature > 0) {
+    // Hot: blend towards red/orange
+    const hotness = Math.pow(temperature, 1.5);
+    newR = Math.min(255, Math.floor(r + (255 - r) * hotness * 0.5));
+    newG = Math.floor(g * (1 - hotness * 0.3));
+    newB = Math.floor(b * (1 - hotness * 0.5));
+  } else if (temperature < 0) {
+    // Cold: blend towards cyan/blue
+    const coldness = Math.pow(-temperature, 1.5);
+    newR = Math.floor(r * (1 - coldness * 0.5));
+    newG = Math.min(255, Math.floor(g + (255 - g) * coldness * 0.3));
+    newB = Math.min(255, Math.floor(b + (255 - b) * coldness * 0.5));
+  }
 
   return `rgb(${newR},${newG},${newB})`;
 }

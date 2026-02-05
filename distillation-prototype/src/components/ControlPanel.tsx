@@ -304,6 +304,14 @@ export function ControlPanel({
           step={0.5}
           onChange={(v) => onParamChange("heatSourceTemp", v)}
         />
+        <ParamSlider
+          label="冷却温度"
+          value={params.coolingTemp}
+          min={-1}
+          max={1}
+          step={0.05}
+          onChange={(v) => onParamChange("coolingTemp", v)}
+        />
 
         {/* Interaction Matrix */}
         <h2 className="text-sm font-semibold text-purple-400 border-b border-gray-700 pb-1 mt-6">

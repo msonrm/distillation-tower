@@ -41,7 +41,8 @@ export interface SimParams {
   gridWidth: number;
   gridHeight: number;
   roomTemp: number;          // 0.0
-  heatSourceTemp: number;    // 1.0
+  heatSourceTemp: number;    // 1.0 (bottom wall)
+  coolingTemp: number;       // top wall temperature (can be negative)
   coolingCoefficient: number; // natural cooling rate
   gravity: number;           // strength of gravity in Kawasaki
   substanceA: SubstanceProps;
@@ -113,6 +114,7 @@ export const DEFAULT_PARAMS: SimParams = {
   gridHeight: 100,
   roomTemp: 0.0,
   heatSourceTemp: 1.0,
+  coolingTemp: 0.0,
   coolingCoefficient: 0.02,
   gravity: 2.0,
   substanceA: DEFAULT_SUBSTANCE_A,

@@ -86,12 +86,12 @@ export function createGrid(params: SimParams): Cell[][] {
           latentHeat: 0,
         };
       }
-      // Top row: wall (cold)
+      // Top row: wall (cooling)
       else if (y === 0) {
         cell = {
           substance: "wall",
           phase: "liquid",
-          temperature: roomTemp,
+          temperature: params.coolingTemp,
           latentHeat: 0,
         };
       }
@@ -189,7 +189,7 @@ function updateHeatConduction(grid: Cell[][], params: SimParams): void {
       if (cell.substance === "wall" && (y === 0 || y === gridHeight - 1)) {
         continue;
       }
-      cell.temperature = Math.max(0, Math.min(1, cell.temperature + tempChanges[y][x]));
+      cell.temperature = Math.max(-1, Math.min(1, cell.temperature + tempChanges[y][x]));
     }
   }
 }
