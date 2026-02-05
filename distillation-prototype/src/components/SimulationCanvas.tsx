@@ -37,7 +37,7 @@ export function SimulationCanvas({
         const cellKey = getCellKey(cell.substance, cell.phase);
         let color = COLORS[cellKey] ?? "#000";
 
-        if (showTemp && cell.substance !== "wall") {
+        if (showTemp) {
           color = getTemperatureColor(color, cell.temperature);
         }
 
