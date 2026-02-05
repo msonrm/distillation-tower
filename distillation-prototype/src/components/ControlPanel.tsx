@@ -39,7 +39,7 @@ export function ControlPanel({
   onToggleShowTemp,
 }: ControlPanelProps) {
   return (
-    <div className="w-80 bg-[#161b22] border-l border-gray-800 p-4 overflow-y-auto">
+    <div className="w-80 h-screen bg-[#161b22] border-l border-gray-800 p-4 overflow-y-auto">
       <h1 className="text-xl font-bold mb-4 text-cyan-400">蒸留シミュレータ</h1>
 
       {/* Control Buttons */}

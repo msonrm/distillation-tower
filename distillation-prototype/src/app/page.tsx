@@ -147,7 +147,7 @@ export default function DistillationSimulator() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-gray-100 flex">
+    <div className="h-screen bg-[#0d1117] text-gray-100 flex overflow-hidden">
       <div className="flex-1 flex items-center justify-center p-4">
         <SimulationCanvas
           grid={gridRef.current}
