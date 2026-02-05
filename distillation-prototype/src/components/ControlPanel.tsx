@@ -284,7 +284,7 @@ export function ControlPanel({
           label="重力"
           value={params.gravity}
           min={0.5}
-          max={5}
+          max={10}
           step={0.1}
           onChange={(v) => onParamChange("gravity", v)}
         />
