@@ -1,37 +1,125 @@
-// Cell types
-export const CellType = {
-  EMPTY: 0,
-  WATER: 1,
-  VAPOR: 2,
-  WALL: 3,
-  HEAT_SOURCE: 4,
-  COLD_SOURCE: 5,
-} as const;
+// Substance types
+export type Substance = "A" | "B" | "wall" | "air";
+export type Phase = "liquid" | "gas";
 
-export type CellTypeValue = (typeof CellType)[keyof typeof CellType];
-
+// Cell structure
 export interface Cell {
-  type: CellTypeValue;
-  temperature: number;
+  substance: Substance;
+  phase: Phase;
+  temperature: number;  // 0.0 (room temp) to 1.0 (heat source)
+  latentHeat: number;   // accumulated latent heat for phase transition
 }
 
+// Substance properties (all values 0-1)
+export interface SubstanceProps {
+  boilingPoint: number;           // temperature at which phase transition occurs
+  latentHeatThreshold: number;    // latent heat needed for phase change
+  liquidDensity: number;          // liquid density (affects gravity)
+  gasDensity: number;             // gas density (much lower than liquid)
+  liquidThermalConductivity: number;  // how fast heat spreads in liquid
+  gasThermalConductivity: number;     // how fast heat spreads in gas
+  liquidHeatCapacity: number;     // resistance to temperature change in liquid
+  gasHeatCapacity: number;        // resistance to temperature change in gas
+}
+
+// Wall and air properties
+export interface FixedSubstanceProps {
+  density: number;
+  thermalConductivity: number;
+  heatCapacity: number;
+}
+
+// Cell keys for interaction matrix
+export const CELL_KEYS = ["A:liquid", "A:gas", "B:liquid", "B:gas", "wall:liquid", "air:gas"] as const;
+export type CellKey = (typeof CELL_KEYS)[number];
+
+// Interaction matrix type (negative = attracts, positive = repels)
+export type InteractionMatrix = Record<CellKey, Record<CellKey, number>>;
+
+// Simulation parameters
 export interface SimParams {
   gridWidth: number;
   gridHeight: number;
-  gravity: number;
-  boilingPoint: number;
-  vaporizeRate: number;
-  condenseRate: number;
-  thermalConductivity: number;
-  heatSourceTemp: number;
-  coldSourceTemp: number;
-  roomTemp: number;
-  latentHeatVaporize: number;
-  latentHeatCondense: number;
+  roomTemp: number;          // 0.0
+  heatSourceTemp: number;    // 1.0 (bottom wall)
+  coolingTemp: number;       // top wall temperature (can be negative)
+  coolingCoefficient: number; // natural cooling rate
+  gravity: number;           // strength of gravity in Kawasaki
+  substanceA: SubstanceProps;
+  substanceB: SubstanceProps;
+  wall: FixedSubstanceProps;
+  air: FixedSubstanceProps;
+  interaction: InteractionMatrix;
 }
 
+// Statistics for display
 export interface SimStats {
-  water: number;
-  vapor: number;
+  liquidA: number;
+  liquidB: number;
+  gasA: number;
+  gasB: number;
   avgTemp: number;
+  fps: number;
 }
+
+// Default substance properties
+export const DEFAULT_SUBSTANCE_A: SubstanceProps = {
+  boilingPoint: 0.6,
+  latentHeatThreshold: 0.3,
+  liquidDensity: 0.7,
+  gasDensity: 0.01,
+  liquidThermalConductivity: 0.5,
+  gasThermalConductivity: 0.1,
+  liquidHeatCapacity: 0.4,
+  gasHeatCapacity: 0.2,
+};
+
+export const DEFAULT_SUBSTANCE_B: SubstanceProps = {
+  boilingPoint: 0.85,
+  latentHeatThreshold: 0.5,
+  liquidDensity: 0.9,
+  gasDensity: 0.01,
+  liquidThermalConductivity: 0.6,
+  gasThermalConductivity: 0.1,
+  liquidHeatCapacity: 0.6,
+  gasHeatCapacity: 0.3,
+};
+
+export const DEFAULT_WALL: FixedSubstanceProps = {
+  density: 10.0,  // Very heavy, doesn't move
+  thermalConductivity: 0.8,
+  heatCapacity: 1.0,
+};
+
+export const DEFAULT_AIR: FixedSubstanceProps = {
+  density: 0.001,  // Very light, rises
+  thermalConductivity: 0.05,
+  heatCapacity: 0.05,
+};
+
+// Default interaction matrix (symmetric)
+// Negative = attracts (same substance liquid-gas, liquid-wall adhesion)
+// Positive = repels (different substances, liquid-air surface tension)
+export const DEFAULT_INTERACTION: InteractionMatrix = {
+  "A:liquid": { "A:liquid": 0, "A:gas": -0.4, "B:liquid": 0.4, "B:gas": 0.3, "wall:liquid": -0.2, "air:gas": 0.9 },
+  "A:gas":    { "A:liquid": -0.4, "A:gas": 0, "B:liquid": 0.3, "B:gas": 0.1, "wall:liquid": 0.1, "air:gas": 0.1 },
+  "B:liquid": { "A:liquid": 0.4, "A:gas": 0.3, "B:liquid": 0, "B:gas": -0.4, "wall:liquid": -0.3, "air:gas": 1.1 },
+  "B:gas":    { "A:liquid": 0.3, "A:gas": 0.1, "B:liquid": -0.4, "B:gas": 0, "wall:liquid": 0.1, "air:gas": 0.1 },
+  "wall:liquid": { "A:liquid": -0.2, "A:gas": 0.1, "B:liquid": -0.3, "B:gas": 0.1, "wall:liquid": 0, "air:gas": 0.3 },
+  "air:gas":  { "A:liquid": 0.9, "A:gas": 0.1, "B:liquid": 1.1, "B:gas": 0.1, "wall:liquid": 0.3, "air:gas": 0 },
+};
+
+export const DEFAULT_PARAMS: SimParams = {
+  gridWidth: 100,
+  gridHeight: 100,
+  roomTemp: 0.0,
+  heatSourceTemp: 1.0,
+  coolingTemp: 0.0,
+  coolingCoefficient: 0.02,
+  gravity: 2.0,
+  substanceA: DEFAULT_SUBSTANCE_A,
+  substanceB: DEFAULT_SUBSTANCE_B,
+  wall: DEFAULT_WALL,
+  air: DEFAULT_AIR,
+  interaction: DEFAULT_INTERACTION,
+};
