@@ -97,12 +97,12 @@ export const DEFAULT_AIR: FixedSubstanceProps = {
 // Negative = attracts (same substance liquid-gas, liquid-wall adhesion)
 // Positive = repels (different substances, liquid-air surface tension)
 export const DEFAULT_INTERACTION: InteractionMatrix = {
-  "A:liquid": { "A:liquid": 0, "A:gas": -0.3, "B:liquid": 0.8, "B:gas": 0.5, "wall:liquid": -0.2, "air:gas": 1.0 },
-  "A:gas":    { "A:liquid": -0.3, "A:gas": 0, "B:liquid": 0.6, "B:gas": 0.2, "wall:liquid": 0.1, "air:gas": 0.1 },
-  "B:liquid": { "A:liquid": 0.8, "A:gas": 0.6, "B:liquid": 0, "B:gas": -0.3, "wall:liquid": -0.2, "air:gas": 1.2 },
-  "B:gas":    { "A:liquid": 0.5, "A:gas": 0.2, "B:liquid": -0.3, "B:gas": 0, "wall:liquid": 0.1, "air:gas": 0.1 },
-  "wall:liquid": { "A:liquid": -0.2, "A:gas": 0.1, "B:liquid": -0.2, "B:gas": 0.1, "wall:liquid": 0, "air:gas": 0.3 },
-  "air:gas":  { "A:liquid": 1.0, "A:gas": 0.1, "B:liquid": 1.2, "B:gas": 0.1, "wall:liquid": 0.3, "air:gas": 0 },
+  "A:liquid": { "A:liquid": 0, "A:gas": -0.4, "B:liquid": 0.4, "B:gas": 0.3, "wall:liquid": -0.2, "air:gas": 0.9 },
+  "A:gas":    { "A:liquid": -0.4, "A:gas": 0, "B:liquid": 0.3, "B:gas": 0.1, "wall:liquid": 0.1, "air:gas": 0.1 },
+  "B:liquid": { "A:liquid": 0.4, "A:gas": 0.3, "B:liquid": 0, "B:gas": -0.4, "wall:liquid": -0.3, "air:gas": 1.1 },
+  "B:gas":    { "A:liquid": 0.3, "A:gas": 0.1, "B:liquid": -0.4, "B:gas": 0, "wall:liquid": 0.1, "air:gas": 0.1 },
+  "wall:liquid": { "A:liquid": -0.2, "A:gas": 0.1, "B:liquid": -0.3, "B:gas": 0.1, "wall:liquid": 0, "air:gas": 0.3 },
+  "air:gas":  { "A:liquid": 0.9, "A:gas": 0.1, "B:liquid": 1.1, "B:gas": 0.1, "wall:liquid": 0.3, "air:gas": 0 },
 };
 
 export const DEFAULT_PARAMS: SimParams = {
