@@ -146,6 +146,10 @@ export default function DistillationSimulator() {
     initGrid();
   };
 
+  const handleResetParams = () => {
+    setParams(DEFAULT_PARAMS);
+  };
+
   return (
     <div className="h-screen bg-[#0d1117] text-gray-100 flex overflow-hidden">
       <div className="flex-1 flex items-center justify-center p-4">
@@ -168,6 +172,7 @@ export default function DistillationSimulator() {
         onInteractionChange={handleInteractionChange}
         onToggleRunning={() => setRunning(!running)}
         onReset={handleReset}
+        onResetParams={handleResetParams}
         onToggleShowTemp={setShowTemp}
       />
     </div>
