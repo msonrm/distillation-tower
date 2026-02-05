@@ -222,6 +222,14 @@ export function ControlPanel({
           壁（熱導体）
         </h2>
         <ParamSlider
+          label="比重"
+          value={params.wall.density}
+          min={1}
+          max={20}
+          step={0.5}
+          onChange={(v) => onFixedSubstanceChange("wall", "density", v)}
+        />
+        <ParamSlider
           label="熱伝導率"
           value={params.wall.thermalConductivity}
           min={0.1}
@@ -242,6 +250,14 @@ export function ControlPanel({
         <h2 className="text-sm font-semibold text-gray-500 border-b border-gray-700 pb-1 mt-6">
           空気（断熱材）
         </h2>
+        <ParamSlider
+          label="比重"
+          value={params.air.density}
+          min={0.0001}
+          max={0.1}
+          step={0.001}
+          onChange={(v) => onFixedSubstanceChange("air", "density", v)}
+        />
         <ParamSlider
           label="熱伝導率"
           value={params.air.thermalConductivity}

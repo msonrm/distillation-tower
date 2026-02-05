@@ -24,6 +24,7 @@ export interface SubstanceProps {
 
 // Wall and air properties
 export interface FixedSubstanceProps {
+  density: number;
   thermalConductivity: number;
   heatCapacity: number;
 }
@@ -84,11 +85,13 @@ export const DEFAULT_SUBSTANCE_B: SubstanceProps = {
 };
 
 export const DEFAULT_WALL: FixedSubstanceProps = {
+  density: 10.0,  // Very heavy, doesn't move
   thermalConductivity: 0.8,
   heatCapacity: 1.0,
 };
 
 export const DEFAULT_AIR: FixedSubstanceProps = {
+  density: 0.001,  // Very light, rises
   thermalConductivity: 0.05,
   heatCapacity: 0.05,
 };

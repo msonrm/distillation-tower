@@ -12,8 +12,8 @@ function getSubstanceProps(cell: Cell, params: SimParams): SubstanceProps | null
 }
 
 function getDensity(cell: Cell, params: SimParams): number {
-  if (cell.substance === "wall") return Infinity;
-  if (cell.substance === "air") return 0.01; // Air density is very low, fixed
+  if (cell.substance === "wall") return params.wall.density;
+  if (cell.substance === "air") return params.air.density;
   const props = getSubstanceProps(cell, params);
   if (!props) return 0;
   return cell.phase === "liquid" ? props.liquidDensity : props.gasDensity;
