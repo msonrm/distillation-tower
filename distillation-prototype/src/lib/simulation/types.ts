@@ -64,31 +64,31 @@ export interface SimStats {
 
 // Default substance properties
 export const DEFAULT_SUBSTANCE_A: SubstanceProps = {
-  boilingPoint: 0.6,
-  latentHeatThreshold: 0.3,
+  boilingPoint: 0.48,
+  latentHeatThreshold: 0.57,
   liquidDensity: 0.7,
   gasDensity: 0.01,
   liquidThermalConductivity: 0.5,
   gasThermalConductivity: 0.1,
   liquidHeatCapacity: 0.4,
-  gasHeatCapacity: 0.2,
+  gasHeatCapacity: 0.42,
 };
 
 export const DEFAULT_SUBSTANCE_B: SubstanceProps = {
-  boilingPoint: 0.85,
-  latentHeatThreshold: 0.5,
+  boilingPoint: 0.92,
+  latentHeatThreshold: 0.92,
   liquidDensity: 0.9,
   gasDensity: 0.01,
   liquidThermalConductivity: 0.6,
   gasThermalConductivity: 0.1,
-  liquidHeatCapacity: 0.6,
+  liquidHeatCapacity: 0.67,
   gasHeatCapacity: 0.3,
 };
 
 export const DEFAULT_WALL: FixedSubstanceProps = {
   density: 10.0,  // Very heavy, doesn't move
-  thermalConductivity: 0.8,
-  heatCapacity: 1.0,
+  thermalConductivity: 1.0,
+  heatCapacity: 0.6,
 };
 
 export const DEFAULT_AIR: FixedSubstanceProps = {
@@ -101,11 +101,11 @@ export const DEFAULT_AIR: FixedSubstanceProps = {
 // Negative = attracts (same substance liquid-gas, liquid-wall adhesion)
 // Positive = repels (different substances, liquid-air surface tension)
 export const DEFAULT_INTERACTION: InteractionMatrix = {
-  "A:liquid": { "A:liquid": 0, "A:gas": -0.4, "B:liquid": 0.4, "B:gas": 0.3, "wall:liquid": -0.2, "air:gas": 0.9 },
-  "A:gas":    { "A:liquid": -0.4, "A:gas": 0, "B:liquid": 0.3, "B:gas": 0.1, "wall:liquid": 0.1, "air:gas": 0.1 },
-  "B:liquid": { "A:liquid": 0.4, "A:gas": 0.3, "B:liquid": 0, "B:gas": -0.4, "wall:liquid": -0.3, "air:gas": 1.1 },
-  "B:gas":    { "A:liquid": 0.3, "A:gas": 0.1, "B:liquid": -0.4, "B:gas": 0, "wall:liquid": 0.1, "air:gas": 0.1 },
-  "wall:liquid": { "A:liquid": -0.2, "A:gas": 0.1, "B:liquid": -0.3, "B:gas": 0.1, "wall:liquid": 0, "air:gas": 0.3 },
+  "A:liquid": { "A:liquid": 0, "A:gas": -0.9, "B:liquid": 0.1, "B:gas": 0.3, "wall:liquid": -0.05, "air:gas": 0.9 },
+  "A:gas":    { "A:liquid": -0.9, "A:gas": 0, "B:liquid": 0.3, "B:gas": 0.1, "wall:liquid": 0.1, "air:gas": 0.1 },
+  "B:liquid": { "A:liquid": 0.1, "A:gas": 0.3, "B:liquid": 0, "B:gas": -0.9, "wall:liquid": -0.05, "air:gas": 1.1 },
+  "B:gas":    { "A:liquid": 0.3, "A:gas": 0.1, "B:liquid": -0.9, "B:gas": 0, "wall:liquid": 0.1, "air:gas": 0.1 },
+  "wall:liquid": { "A:liquid": -0.1, "A:gas": 0.1, "B:liquid": -0.1, "B:gas": 0.1, "wall:liquid": 0, "air:gas": 0.3 },
   "air:gas":  { "A:liquid": 0.9, "A:gas": 0.1, "B:liquid": 1.1, "B:gas": 0.1, "wall:liquid": 0.3, "air:gas": 0 },
 };
 
@@ -113,10 +113,10 @@ export const DEFAULT_PARAMS: SimParams = {
   gridWidth: 100,
   gridHeight: 100,
   roomTemp: 0.0,
-  heatSourceTemp: 1.0,
-  coolingTemp: 0.0,
-  coolingCoefficient: 0.02,
-  gravity: 2.0,
+  heatSourceTemp: 13.0,
+  coolingTemp: -1.0,
+  coolingCoefficient: 0.006,
+  gravity: 1.9,
   substanceA: DEFAULT_SUBSTANCE_A,
   substanceB: DEFAULT_SUBSTANCE_B,
   wall: DEFAULT_WALL,
