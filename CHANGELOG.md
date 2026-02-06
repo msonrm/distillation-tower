@@ -2,10 +2,19 @@
 
 ## [Unreleased]
 
+(なし)
+
+## [0.2.0] - Cleanup & Documentation
+
 ### Added
 - SPEC.md: プロジェクト仕様書を作成（物理モデル・ゲーム設計・UI仕様を統合）
 - TODO.md: タスク管理ファイルを作成
 - CHANGELOG.md: 変更履歴ファイルを作成
+- 「パラメータを既定値に戻す」ボタンを追加
+- 統計表示を Canvas 上部のステータスバーに移動
+
+### Changed
+- 初期液体配置領域をグリッド下部 50% に拡大（65% → 50% の位置から開始）
 
 ### Removed
 - `distillation-prototype.zip`: ソースコードと重複する不要なアーカイブを削除
