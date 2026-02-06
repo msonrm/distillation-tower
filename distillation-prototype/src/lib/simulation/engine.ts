@@ -104,9 +104,9 @@ export function createGrid(params: SimParams): Cell[][] {
           latentHeat: 0,
         };
       }
-      // Liquid pool at bottom (~1/3 of grid)
+      // Liquid pool at bottom (~50% of grid)
       // Mix of substance A and B
-      else if (y > gridHeight * 0.65 && y < gridHeight - 1) {
+      else if (y > gridHeight * 0.50 && y < gridHeight - 1) {
         if (Math.random() < 0.9) {
           cell = {
             substance: Math.random() < 0.4 ? "A" : "B", // 40% A, 60% B

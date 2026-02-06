@@ -55,20 +55,24 @@ export function SimulationCanvas({
   const height = grid ? grid.length * cellSize : 0;
 
   return (
-    <div className="relative">
+    <div className="flex flex-col items-center">
+      <div className="bg-black/70 px-3 py-1 rounded mb-2 text-xs font-mono">
+        <span>Frame: {frame}</span>
+        <span className="mx-2">|</span>
+        <span>FPS: {stats.fps.toFixed(1)}</span>
+        <span className="mx-2">|</span>
+        <span>A: {stats.liquidA}L/{stats.gasA}G</span>
+        <span className="mx-2">|</span>
+        <span>B: {stats.liquidB}L/{stats.gasB}G</span>
+        <span className="mx-2">|</span>
+        <span>Avg Temp: {(stats.avgTemp * 100).toFixed(0)}%</span>
+      </div>
       <canvas
         ref={canvasRef}
         width={width}
         height={height}
         className="border border-gray-700 rounded"
       />
-      <div className="absolute top-2 left-2 bg-black/70 px-2 py-1 rounded text-xs font-mono">
-        <div>Frame: {frame} | FPS: {stats.fps.toFixed(1)}</div>
-        <div>
-          A: {stats.liquidA}L/{stats.gasA}G | B: {stats.liquidB}L/{stats.gasB}G
-        </div>
-        <div>Avg Temp: {(stats.avgTemp * 100).toFixed(0)}%</div>
-      </div>
     </div>
   );
 }

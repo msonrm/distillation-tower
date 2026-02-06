@@ -23,6 +23,7 @@ interface ControlPanelProps {
   onInteractionChange: (from: CellKey, to: CellKey, value: number) => void;
   onToggleRunning: () => void;
   onReset: () => void;
+  onResetParams: () => void;
   onToggleShowTemp: (show: boolean) => void;
 }
 
@@ -36,6 +37,7 @@ export function ControlPanel({
   onInteractionChange,
   onToggleRunning,
   onReset,
+  onResetParams,
   onToggleShowTemp,
 }: ControlPanelProps) {
   return (
@@ -43,7 +45,7 @@ export function ControlPanel({
       <h1 className="text-xl font-bold mb-4 text-cyan-400">蒸留シミュレータ</h1>
 
       {/* Control Buttons */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-3">
         <button
           onClick={onToggleRunning}
           className={`flex-1 py-2 px-4 rounded font-medium transition ${
@@ -59,6 +61,14 @@ export function ControlPanel({
           className="flex-1 py-2 px-4 rounded font-medium bg-gray-600 hover:bg-gray-700 transition"
         >
           リセット
+        </button>
+      </div>
+      <div className="mb-6">
+        <button
+          onClick={onResetParams}
+          className="w-full py-1.5 px-4 rounded font-medium bg-purple-700 hover:bg-purple-800 transition text-sm"
+        >
+          パラメータを既定値に戻す
         </button>
       </div>
 
