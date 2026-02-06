@@ -1,12 +1,60 @@
-# 蒸留シミュレータ 仕様書
+# ザルバールの蒸留塔 — 製品仕様書
 
 ## コンセプト
 
-「ザルバールの蒸留塔」（1995年、オニオンソフト）のリメイク企画。オリジナルは比重差による液体分離パズルだったが、本作では**温度ベースの蒸留（分留）** をコアメカニクスに追加する。
+「ザルバールの蒸留塔」（1995年、オニオンソフト）のリメイク。
+オリジナルは比重差による液体分離パズルだったが、本作では**温度ベースの蒸留（分留）** をコアメカニクスに追加する。
 
-本リポジトリはそのための**物理シミュレーション・プロトタイプ**であり、セル・オートマトンで沸点の異なる2種類の液体の加熱・気化・冷却・凝縮サイクルを再現する。
+## プラットフォーム・技術方針
 
-## ゲーム設計（最終目標）
+| 項目 | 方針 |
+|------|------|
+| プラットフォーム | iPad (iOS) |
+| 言語 | Swift |
+| UI フレームワーク | SwiftUI |
+| 描画 | SwiftUI `Canvas` ビュー |
+| アニメーション | `TimelineView` |
+| 状態管理 | `@Observable` |
+| 配布リポジトリ | `distillation-tower.swiftpm` |
+| 開発環境 | iPad Swift Playgrounds / Xcode |
+
+### リポジトリ構成
+
+```
+distillation-tower/                    # 本リポジトリ（設計・プロトタイプ）
+├── SPEC.md                            # 本ドキュメント（製品仕様）
+├── PROTOTYPE.md                       # Web版プロトタイプ実装仕様
+├── TODO.md
+├── CHANGELOG.md
+└── distillation-prototype/            # Web版 (Next.js) — パラメータ調整用
+
+distillation-tower.swiftpm/            # 別リポジトリ（製品）
+├── Package.swift
+├── Sources/
+│   ├── App.swift
+│   ├── Models/
+│   │   ├── Cell.swift                 # セルデータ構造
+│   │   ├── Substance.swift            # 物質 enum + プロパティ
+│   │   └── SimulationParams.swift     # パラメータ定義
+│   ├── Engine/
+│   │   ├── SimulationEngine.swift     # メイン処理ループ
+│   │   ├── HeatConduction.swift       # 熱伝導
+│   │   ├── PhaseTransition.swift      # 相転移
+│   │   └── KawasakiDynamics.swift     # セル交換
+│   └── Views/
+│       ├── GameView.swift             # メイン画面
+│       ├── SimulationCanvas.swift     # Canvas 描画
+│       ├── SetupPhaseView.swift       # 設定フェーズ UI
+│       └── StageSelectView.swift      # ステージ選択
+└── Resources/
+    └── Stages/                        # ステージデータ (JSON)
+```
+
+> `.swiftpm` パッケージ形式にすることで、iPadでリポジトリをダウンロードし Swift Playgrounds から直接開ける。
+
+## ゲーム設計
+
+### ゲームフロー
 
 ```
 ┌─ 設定フェーズ ─────────────┐
@@ -22,7 +70,21 @@
 └────────────────────────────┘
 ```
 
-### 架空液体（ゲーム版で使用予定）
+### 操作システム
+
+| 要素 | 操作 |
+|------|------|
+| 壁 | 設定フェーズで設置/削除 |
+| 金属ブロック | 設定フェーズで配置、実行中に指タッチで作動 |
+
+### 金属の種類
+
+| 金属 | 効果 |
+|------|------|
+| 赤銅 | 触れると高温（加熱用） |
+| 青鋼 | 触れると低温（冷却用） |
+
+### 架空液体
 
 | 名前 | 色 | 比重 | 沸点 |
 |------|-----|------|------|
@@ -31,144 +93,45 @@
 | ルビン | 赤 | 重 | 低 |
 | ヴェルデ | 緑 | 中 | 極低 |
 
+数値は非表示。「重い/軽い」「蒸発しやすい/しにくい」で抽象的に表現する。
+
 ### クリア条件
 
 指定タンクに、**目標純度以上**の液体を**一定量以上**回収する。
 
-## 技術スタック
-
-| 項目 | 技術 |
-|------|------|
-| フレームワーク | Next.js 16 (App Router) |
-| 言語 | TypeScript 5.9 |
-| UI | React 19 |
-| スタイリング | Tailwind CSS 4 + PostCSS |
-| 描画 | Canvas API |
-| デプロイ | Vercel |
-
-## ディレクトリ構成
-
-```
-distillation-tower/
-├── CLAUDE.md                          # Claude Code 指示書
-├── SPEC.md                            # 本ドキュメント
-├── TODO.md                            # タスク管理
-├── CHANGELOG.md                       # 変更履歴
-├── README.md
-│
-└── distillation-prototype/            # Next.js アプリケーション
-    ├── package.json
-    ├── tsconfig.json
-    ├── next.config.mjs
-    ├── tailwind.config.ts
-    │
-    └── src/
-        ├── app/
-        │   ├── page.tsx               # メインページ（状態管理・アニメーションループ）
-        │   ├── layout.tsx             # ルートレイアウト
-        │   └── globals.css
-        │
-        ├── components/
-        │   ├── SimulationCanvas.tsx    # Canvas 描画
-        │   ├── ControlPanel.tsx       # パラメータ操作 UI
-        │   ├── ParamSlider.tsx        # スライダーコンポーネント
-        │   └── index.ts
-        │
-        └── lib/simulation/
-            ├── engine.ts              # シミュレーションエンジン
-            ├── types.ts               # 型定義 + デフォルトパラメータ
-            ├── constants.ts           # 結合力・色・温度色変換
-            └── index.ts
-```
+例: ルビンを純度80%以上で50ml回収せよ
 
 ## 物理モデル
+
+> Web版プロトタイプで検証済み。詳細な実装パラメータは [PROTOTYPE.md](PROTOTYPE.md) を参照。
 
 ### ベース理論
 
 イジングモデル + カワサキダイナミクス（セル交換） + 潜熱モデル（相転移）
 
-### セルの種類
-
-| 物質 | フェーズ | 役割 |
-|------|----------|------|
-| A | liquid / gas | 低沸点物質（アルコール的、沸点 0.48） |
-| B | liquid / gas | 高沸点物質（水的、沸点 0.92） |
-| wall | liquid | 壁（熱源・冷却源・側壁） |
-| air | gas | 空気（空間） |
-
 ### セルデータ構造
 
-```typescript
-interface Cell {
-  substance: "A" | "B" | "wall" | "air";
-  phase: "liquid" | "gas";
-  temperature: number;   // -1.0（冷却）〜 0.0（室温）〜 1.0+（加熱）
-  latentHeat: number;    // 蓄積された潜熱
+```swift
+struct Cell {
+    var substance: Substance   // .aqua, .oleo, .rubin, .verde, .wall, .air
+    var phase: Phase           // .liquid, .gas
+    var temperature: Double    // -1.0（冷却）〜 0.0（室温）〜 1.0+（加熱）
+    var latentHeat: Double     // 蓄積された潜熱
 }
 ```
 
-### 物質プロパティ
+> `Cell` を `struct` にすることで連続メモリ配置となり、キャッシュ効率が向上する。
 
-各物質（A, B）に対して以下が設定可能:
-
-- **沸点** (boilingPoint)
-- **潜熱閾値** (latentHeatThreshold)
-- **液体密度** / **気体密度**
-- **液体熱伝導率** / **気体熱伝導率**
-- **液体比熱容量** / **気体比熱容量**
-
-壁・空気は密度・熱伝導率・比熱容量のみ。
-
-## シミュレーション処理フロー
-
-毎フレーム、以下の4ステップを実行:
+### 処理フロー（毎フレーム）
 
 ```
 1. updateHeatAndCooling()    - 自然冷却（室温へのドリフト）
 2. updateHeatConduction()    - フーリエの法則による熱伝導
 3. updatePhaseTransition()   - 潜熱蓄積モデルによる相転移
-4. updateKawasaki() × 2     - カワサキダイナミクスによるセル交換
+4. updateKawasaki() × N     - カワサキダイナミクスによるセル交換
 ```
 
-### 1. 自然冷却
-
-全セルの温度を室温方向へ減衰させる。壁は固定温度。
-
-```
-ΔT = -(T - roomTemp) × coolingCoefficient
-```
-
-### 2. 熱伝導（フーリエの法則）
-
-4近傍で熱拡散。有効熱伝導率は調和平均を使用:
-
-```
-k_eff = 2 × k_self × k_neighbor / (k_self + k_neighbor + ε)
-heatFlow = k_eff × (T_neighbor - T_self)
-ΔT = Σ heatFlow / (heatCapacity + 0.1) × 0.1
-```
-
-温度は [-1, 1] にクランプ。上下壁は固定温度。
-
-### 3. 相転移（潜熱モデル）
-
-確率的ではなく、**潜熱蓄積モデル**を採用:
-
-**気化** (liquid → gas):
-- 温度 >= 沸点のとき、超過分を潜熱として蓄積
-- 温度は沸点に固定
-- 潜熱が閾値に達したらフェーズ変化
-
-**凝縮** (gas → liquid):
-- 温度 < 沸点のとき、不足分だけ潜熱を放出
-- 温度は沸点に固定
-- 潜熱が 0 になったらフェーズ変化
-
-### 4. カワサキダイナミクス（セル交換）
-
-チェッカーボード分解（パリティ交互）で並列性を確保。
-
-**エネルギー計算**:
+### エネルギー計算
 
 ```
 E = E_gravity + E_cohesion + E_interface
@@ -178,7 +141,7 @@ E_cohesion  = -cohesion × 0.5 × (同種隣接セル数)
 E_interface = Σ interaction[type][neighbor] × 0.8
 ```
 
-**交換判定（メトロポリス法）**:
+### 交換判定（メトロポリス法）
 
 ```
 ΔE = E_after - E_before
@@ -191,102 +154,44 @@ else:       accept = random() < exp(-β × ΔE)
 - 8方向（直交4 + 対角4）への交換を試行
 - 対角交換は ΔE を √2 で割る（結合面積の補正）
 - Fisher-Yates シャッフルで方向バイアスを排除
-- スキャンパターンを8通りからランダム選択
+- チェッカーボード分解（パリティ交互）で並列性を確保
 
-### 相互作用マトリックス
+### 相転移（潜熱モデル）
 
-6×6 の対称行列。正 = 反発、負 = 引力:
+**気化** (liquid → gas):
+- 温度 >= 沸点のとき、超過分を潜熱として蓄積
+- 温度は沸点に固定
+- 潜熱が閾値に達したらフェーズ変化
 
-```
-         AL    AG    BL    BG    W     Air
-AL       0    -0.9   0.1   0.3  -0.05  0.9
-AG      -0.9   0     0.3   0.1   0.1   0.1
-BL       0.1   0.3   0    -0.9  -0.05  1.1
-BG       0.3   0.1  -0.9   0     0.1   0.1
-W       -0.1   0.1  -0.1   0.1   0     0.3
-Air      0.9   0.1   1.1   0.1   0.3   0
-```
+**凝縮** (gas → liquid):
+- 温度 < 沸点のとき、不足分だけ潜熱を放出
+- 温度は沸点に固定
+- 潜熱が 0 になったらフェーズ変化
 
-## グリッド初期配置
+### 熱伝導（フーリエの法則）
 
 ```
-Row 0:              冷却壁 (coolingTemp)
-Row 1〜49:          空気
-Row 50〜98:         A(40%) + B(60%) を 90% 密度でランダム配置
-Row 99:             加熱壁 (heatSourceTemp)
-Column 0, 99:       側壁 (roomTemp)
+k_eff = 2 × k_self × k_neighbor / (k_self + k_neighbor + ε)
+heatFlow = k_eff × (T_neighbor - T_self)
+ΔT = Σ heatFlow / (heatCapacity + 0.1) × 0.1
 ```
 
-グリッドサイズ: 100 × 100（デフォルト）
+## SwiftUI 移植メモ
 
-## UI 構成
+### Web版との対応
 
-### Canvas 表示（左パネル）
+| Web版 (TypeScript) | SwiftUI版 |
+|---|---|
+| `requestAnimationFrame` | `TimelineView(.animation)` |
+| React `useState` / `useRef` | `@Observable` クラス |
+| Canvas API (`fillRect`) | SwiftUI `Canvas` + `context.fill(Path)` |
+| スライダー UI | SwiftUI `Slider` / `.inspector` |
+| `SimParams` (object) | `SimulationParams` (struct, Codable) |
+| `Cell[][]` (Array of objects) | `[Cell]` (1D struct 配列, row-major) |
 
-- グリッドのリアルタイム描画
-- 温度による色ブレンド（オプション）
-- Canvas 上部にステータスバー: フレーム数、FPS、物質統計、平均温度
+### パフォーマンス上の注意
 
-### コントロールパネル（右パネル、320px）
-
-| カテゴリ | パラメータ |
-|----------|------------|
-| 制御 | 開始/停止、リセット、パラメータ既定値復元、温度表示切替 |
-| 物質A | 沸点、潜熱閾値、液/気の密度・熱伝導率・比熱容量 |
-| 物質B | 同上 |
-| 壁 | 密度、熱伝導率、比熱容量 |
-| 空気 | 密度、熱伝導率、比熱容量 |
-| システム | 重力、冷却係数、熱源温度、冷却温度 |
-| 相互作用 | 6×6 対称マトリックス |
-
-### 描画色
-
-| セル | 色 | 説明 |
-|------|-----|------|
-| A:liquid | `#f97316` | オレンジ |
-| A:gas | `#fed7aa` | 薄オレンジ |
-| B:liquid | `#3b82f6` | 青 |
-| B:gas | `#93c5fd` | 薄青 |
-| wall | `#374151` | 灰 |
-| air | `#0d1117` | 暗い背景 |
-
-## デフォルトパラメータ
-
-### システム
-
-| パラメータ | デフォルト値 |
-|------------|-------------|
-| gridWidth / gridHeight | 100 |
-| roomTemp | 0.0 |
-| heatSourceTemp | 13.0 |
-| coolingTemp | -1.0 |
-| coolingCoefficient | 0.006 |
-| gravity | 1.9 |
-
-### 物質A（低沸点・アルコール的）
-
-| パラメータ | 値 |
-|------------|-----|
-| boilingPoint | 0.48 |
-| latentHeatThreshold | 0.57 |
-| liquidDensity | 0.7 |
-| gasDensity | 0.01 |
-
-### 物質B（高沸点・水的）
-
-| パラメータ | 値 |
-|------------|-----|
-| boilingPoint | 0.92 |
-| latentHeatThreshold | 0.92 |
-| liquidDensity | 0.9 |
-| gasDensity | 0.01 |
-
-## ローカル実行
-
-```bash
-cd distillation-prototype
-npm install
-npm run dev
-```
-
-http://localhost:3000 で確認。
+- `Cell` は必ず `struct` にする（`class` にしない）
+- グリッドは `[Cell]`（1次元配列, row-major）でアクセスする
+- `Canvas` ビューでは `context.fill(Path)` をバッチ描画する
+- 将来的に Metal Compute Shader への移行も視野に入れる（Xcode必須）

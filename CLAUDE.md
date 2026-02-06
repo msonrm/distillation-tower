@@ -33,6 +33,8 @@
 
 ## Documentation
 
+- `SPEC.md` - 製品仕様（SwiftUI版ゲーム設計・物理モデル）
+- `PROTOTYPE.md` - Web版プロトタイプ実装仕様
 - `TODO.md` - 実装予定・進行中のタスク
 - `CHANGELOG.md` - 変更履歴
 

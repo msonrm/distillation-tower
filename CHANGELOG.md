@@ -2,7 +2,11 @@
 
 ## [Unreleased]
 
-(なし)
+### Changed
+- SPEC.md → PROTOTYPE.md にリネーム（Web版プロトタイプ実装仕様として保持）
+- 新規 SPEC.md を作成（SwiftUI版製品仕様: ゲーム設計・物理モデル・技術方針・.swiftpm構成）
+- TODO.md を SwiftUI版ロードマップに更新
+- README.md をドキュメント構成・リポジトリ構成の説明に更新
 
 ## [0.2.0] - Cleanup & Documentation
 

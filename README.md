@@ -1,12 +1,26 @@
 # distillation-tower
 
-セル・オートマトン（カワサキダイナミクス）による蒸留シミュレーション・プロトタイプ。
+「ザルバールの蒸留塔」リメイク — 温度ベースの蒸留パズルゲーム。
 
-沸点の異なる2種類の液体を加熱し、気化・冷却・凝縮による分留サイクルを再現する。
+セル・オートマトン（カワサキダイナミクス）で沸点の異なる液体の加熱・気化・冷却・凝縮による分留サイクルを再現する。
 
-詳細は [SPEC.md](SPEC.md) を参照。
+## ドキュメント
 
-## 実行方法
+| ファイル | 内容 |
+|----------|------|
+| [SPEC.md](SPEC.md) | 製品仕様（SwiftUI版ゲーム設計・物理モデル） |
+| [PROTOTYPE.md](PROTOTYPE.md) | Web版プロトタイプ実装仕様（パラメータ調整用） |
+| [TODO.md](TODO.md) | タスク管理 |
+| [CHANGELOG.md](CHANGELOG.md) | 変更履歴 |
+
+## リポジトリ構成
+
+| リポジトリ | 用途 |
+|------------|------|
+| `distillation-tower` (本リポジトリ) | 設計 + Web版プロトタイプ |
+| `distillation-tower.swiftpm` (将来) | SwiftUI製品版（iPad Swift Playgrounds対応） |
+
+## Web版プロトタイプの実行
 
 ```bash
 cd distillation-prototype
