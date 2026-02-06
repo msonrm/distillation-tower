@@ -5,6 +5,8 @@
 ### Changed
 - SPEC.md → PROTOTYPE.md にリネーム（Web版プロトタイプ実装仕様として保持）
 - 新規 SPEC.md を作成（SwiftUI版製品仕様: ゲーム設計・物理モデル・技術方針・.swiftpm構成）
+- SPEC.md にリポジトリ運用セクションを追加（2リポジトリ体制・SPEC.md管理・同梱ルール）
+- CLAUDE.md をブラッシュアップ（両リポジトリ共用、プロジェクト概要・言語規約・参照先ガイド追加）
 - TODO.md を SwiftUI版ロードマップに更新
 - README.md をドキュメント構成・リポジトリ構成の説明に更新
 

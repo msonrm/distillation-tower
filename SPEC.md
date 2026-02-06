@@ -176,6 +176,31 @@ heatFlow = k_eff × (T_neighbor - T_self)
 ΔT = Σ heatFlow / (heatCapacity + 0.1) × 0.1
 ```
 
+## リポジトリ運用
+
+### 2リポジトリ体制
+
+| リポジトリ | 役割 | 主な内容 |
+|---|---|---|
+| `distillation-tower` | 設計の本拠地 + プロトタイプ | SPEC.md (原本), PROTOTYPE.md, Web版コード |
+| `distillation-tower.swiftpm` | 製品コード | SPEC.md (コピー), Swift ソース, ステージデータ |
+
+### SPEC.md の管理
+
+- **原本**: `distillation-tower` で管理・更新する
+- **コピー**: `distillation-tower.swiftpm` に同梱し、製品側でも仕様を参照できるようにする
+- 原本を更新したら、必要に応じて `.swiftpm` 側にも反映する
+
+### .swiftpm に持っていくもの
+
+| ファイル | 同梱 | 理由 |
+|---|:---:|---|
+| SPEC.md | o | 製品側で仕様参照 |
+| CLAUDE.md | o | Claude Code で開発する場合に必要 |
+| PROTOTYPE.md | x | Web版固有の実装詳細 |
+| TODO.md / CHANGELOG.md | x | 向こうで別途作成 |
+| distillation-prototype/ | x | Web版コード一式 |
+
 ## SwiftUI 移植メモ
 
 ### Web版との対応
